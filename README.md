@@ -1,2 +1,2 @@
-Playing around with project taken from:
+Playing around with bomber project taken from:
 https://github.com/DmytroVasin/bomber
