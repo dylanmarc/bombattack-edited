@@ -83,6 +83,7 @@ export class PlayerSlots extends Phaser.Group {
     super(game);
 
     let xOffset = x;
+    let scale = 0.5;
 
     for (let i = 0; i < max_players; i++) {
       let slotBox
@@ -90,16 +91,20 @@ export class PlayerSlots extends Phaser.Group {
       let _player = players[i]
 
       if (_player) {
-        slotBox = new Phaser.Image(this.game, xOffset, y, asset_player+_player.skin)
-        slotName = new Phaser.Text(this.game, slotBox.width/2, slotBox.height + 15, _player.skin, style);
-        slotName.anchor.setTo(0.5);
-        slotBox.addChild(slotName);
+        slotBox = new Phaser.Image(this.game, xOffset, y+(i <= 5 ? 0 : 100), asset_player+_player.skin);
+        slotBox.scale.setTo(scale);
+        // slotName = new Phaser.Text(this.game, slotBox.width/2, slotBox.height + 60, _player.skin, style);
+        // slotName.anchor.setTo(0.5);
+        // slotBox.addChild(slotName);
       } else {
-        slotBox = new Phaser.Image(this.game, xOffset, y, asset_empty)
+        slotBox = new Phaser.Image(this.game, xOffset, y+(i <= 5 ? 0 : 100), asset_empty)
+        slotBox.scale.setTo(0.5);
       }
 
+      console.log(slotBox)
       this.add(slotBox);
-      xOffset += 170;
+      xOffset += 170*scale;
+      if(i == 5) xOffset = x;
     }
   }
 

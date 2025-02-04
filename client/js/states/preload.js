@@ -57,6 +57,7 @@ class Preload extends Phaser.State {
     this.load.image('bomberman_head_Baradir',   'images/game/chars/9-face.png');
     this.load.image('bomberman_head_Raviel',    'images/game/chars/10-face.png');
     this.load.image('bomberman_head_Valpo',     'images/game/chars/11-face.png');
+    
 
     this.load.spritesheet('bomberman_Theodora',  'images/game/chars/1-preview.png', 32, 32);
     this.load.spritesheet('bomberman_Ringo',     'images/game/chars/2-preview.png', 32, 32);

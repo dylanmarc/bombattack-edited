@@ -23,7 +23,7 @@ class Play extends Phaser.State {
 
   update() {
     this.game.physics.arcade.collide(this.player, this.blockLayer);
-    this.game.physics.arcade.collide(this.player, this.enemies);
+    // this.game.physics.arcade.collide(this.player, this.enemies);
     this.game.physics.arcade.collide(this.player, this.bombs);
 
     this.game.physics.arcade.overlap(this.player, this.spoils, this.onPlayerVsSpoil, null, this);
@@ -131,6 +131,7 @@ class Play extends Phaser.State {
 
       this.spoils.add(new Spoil(this.game, cell.spoil));
     };
+    
   }
 
   onSpoilWasPicked({ player_id, spoil_id, spoil_type }){

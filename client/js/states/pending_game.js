@@ -81,7 +81,7 @@ class PendingGame extends Phaser.State {
 
     this.slotsWithPlayer = new PlayerSlots({
       game: this.game,
-      max_players: current_game.max_players,
+      max_players: 11,
       players: players,
       x: this.game.world.centerX - 245,
       y: this.game.world.centerY - 80,
@@ -93,7 +93,7 @@ class PendingGame extends Phaser.State {
       }
     })
 
-    if(players.length > 1) {
+    if(players.length > 0) {
       this.startGameButton.enable();
     } else {
       this.startGameButton.disable();

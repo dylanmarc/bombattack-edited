@@ -14,18 +14,24 @@ class Game {
     this.map_name     = map_name;
 
     this.layer_info   = require('../../client/maps/' + this.map_name + '.json').layers[0]
-    this.max_players  = this.layer_info.properties.max_players
+    this.max_players  = 11
 
-    // NOTE: we can`t use new Map - because Socket.io do not support such format
     this.players     = {}
-
-    // NOTE: Copy objct - not reference
     this.playerSkins = SKINS.slice()
 
-    // NOTE: Copy objct - not reference
-    this.playerSpawns = this.layer_info.properties.spawns.slice()
-
+    // Generate shadow_map first
     this.shadow_map   = this.createMapData();
+
+    // Generate spawn points from empty cells
+    this.playerSpawns = [];
+    for (let row = 0; row < this.shadow_map.length; row++) {
+      for (let col = 0; col < this.shadow_map[row].length; col++) {
+        if (this.shadow_map[row][col] === EMPTY_CELL) {
+          this.playerSpawns.push({ col: col, row: row });
+        }
+      }
+    }
+
     this.spoils       = new Map();
     this.bombs        = new Map();
   }
