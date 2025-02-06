@@ -34,8 +34,22 @@ export default class Player extends Phaser.Sprite {
 
     this.info = new Info({ game: this.game, player: this });
 
+    this.scoreText = game.add.text(this.x, this.y - 30, "0", {
+      font: "16px Arial",
+      fill: "#fff",
+      stroke: "#000",
+      strokeThickness: 3
+    });
+    this.scoreText.anchor.set(0.5);
+    this.game.add.existing(this.scoreText);
+
     this.defineKeyboard()
     this.defineSelf(skin)
+  }
+
+  updateScoreDisplay(score) {
+    this.scoreText.text = score;
+    this.scoreText.bringToTop();
   }
 
   update() {
@@ -43,6 +57,9 @@ export default class Player extends Phaser.Sprite {
       this.handleMoves()
       this.handleBombs()
     }
+  
+    this.scoreText.x = this.x;
+    this.scoreText.y = this.y - 30;
 
     // this.game.debug.body(this);
     // this.game.debug.spriteInfo(this, 32, 32);
@@ -115,8 +132,9 @@ export default class Player extends Phaser.Sprite {
   }
 
   becomesDead() {
-    this.info.showDeadInfo()
+    this.info.showDeadInfo();
     this.kill();
+    this.body.enable = false; // Disable physics
   }
 
   pickSpoil( spoil_type ){

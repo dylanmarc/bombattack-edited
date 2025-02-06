@@ -101,7 +101,6 @@ export class PlayerSlots extends Phaser.Group {
         slotBox.scale.setTo(0.5);
       }
 
-      console.log(slotBox)
       this.add(slotBox);
       xOffset += 170*scale;
       if(i == 5) xOffset = x;

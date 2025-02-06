@@ -22,6 +22,11 @@ export default class Info {
     delayIcon.addChild(this.delayText)
     this.game.add.existing(delayIcon);
 
+    let killIcon  = new Phaser.Image(this.game, 320, 2, 'placeholder_time');
+    this.killText = new Phaser.Text(this.game, 35, 7, this.killLabel(), this.style);
+    killIcon.addChild(this.killText)
+    this.game.add.existing(killIcon);
+
     this.deadText = this.game.add.text(this.game.world.centerX, this.game.world.height - 30, 'You died :(', this.redStyle);
     this.deadText.anchor.set(0.5);
     this.deadText.visible = false
@@ -31,6 +36,7 @@ export default class Info {
     this.speedText.text = this.speedLabel();
     this.powerText.text = this.powerLabel();
     this.delayText.text = this.delayLabel();
+    this.killText.text = this.killLabel();
   }
 
   showDeadInfo() {
@@ -47,5 +53,9 @@ export default class Info {
 
   delayLabel() {
     return `${this.player.delay / 1000} sec.`
+  }
+
+  killLabel() {
+    return `${this.player.kills || 0} kills`;
   }
 }

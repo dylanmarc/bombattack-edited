@@ -6,7 +6,7 @@ var uuidv4 = require('uuid/v4');
 
 class Bomb {
 
-  constructor({ game, col, row, power }) {
+  constructor({ game, col, row, power, ownerId }) {
     this.id = uuidv4();
 
     this.game = game;
@@ -17,12 +17,15 @@ class Bomb {
     this.row = row
 
     this.blastedCells = [];
+
+    this.ownerId = ownerId;
   }
 
   detonate() {
     let row   = this.row;
     let col   = this.col;
     let power = this.power;
+    let ownerId = this.ownerId;
 
     this.game.nullifyMapCell(row, col);
     this.addToBlasted(row, col, 'center', false)
@@ -57,6 +60,16 @@ class Bomb {
         this.addToBlasted(currentRow, currentCol, direction.plumb, isBalk)
       }
     }
+    // Check for player collisions
+    // Object.values(this.game.players).forEach(player => {
+    //   if (!player.isAlive) return;
+      
+    //   this.blastedCells.forEach(cell => {
+    //     if (player.currentRow === cell.row && player.currentCol === cell.col) {
+    //       player.dead(ownerId, this.game);
+    //     }
+    //   });
+    // });
 
     return this.blastedCells;
   }

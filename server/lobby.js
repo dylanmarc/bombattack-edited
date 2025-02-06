@@ -69,11 +69,13 @@ var Lobby = {
 
   deletePendingGame: function(game_id) {
     let game = pendingGames.get(game_id);
-
+    if (!game) {
+      console.log('Game not found for deletion:', game_id);
+      return null;
+    }
     pendingGames.delete(game.id);
     Lobby.updateLobbyGames();
-
-    return game
+    return game;
   },
 
   availablePendingGames: function() {

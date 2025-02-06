@@ -19,6 +19,8 @@ const SKINS = [
   'Biarid', 'Solia', 'Kedan', 'Nigob', 'Baradir', 'Raviel', 'Valpo'
 ]
 
+const KILLS_TO_WIN = 1;
+
 module.exports = {
   TILE_SIZE,
   EXPLOSION_TIME,
@@ -31,5 +33,6 @@ module.exports = {
   NON_DESTRUCTIBLE_CELL,
   INITIAL_POWER,
   STEP_POWER,
-  SKINS
+  SKINS,
+  KILLS_TO_WIN
 }

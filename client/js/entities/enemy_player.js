@@ -21,13 +21,44 @@ export default class EnemyPlayer extends Phaser.Sprite {
     this.animations.add('right', [6, 7, 8], 15, true);
     this.animations.add('left', [3, 4, 5], 15, true);
 
+    this.scoreText = game.add.text(this.x, this.y - 30, "0", {
+      font: "16px Arial",
+      fill: "#fff",
+      stroke: "#000",
+      strokeThickness: 3
+    });
+    this.scoreText.anchor.set(0.5);
+    this.game.add.existing(this.scoreText);
+
     this.defineSelf(skin)
   }
 
-  update () {
-    // this.game.debug.body(this);
+  updateScoreDisplay(score) {
+    this.scoreText.text = score;
+    this.scoreText.bringToTop();
   }
 
+  update() {
+    if (!this.alive) return;
+
+    this.scoreText.x = this.x;
+    this.scoreText.y = this.y - 30;
+  }
+
+  becomesDead() {
+    this.alive = false;
+    this.kill();
+    this.body.enable = false; // Disable physics
+  }
+
+  respawn(spawn) {
+    this.reset(spawn.x, spawn.y);
+    this.revive();
+    this.alive = true;
+    this.body.enable = true;
+    this.currentPosition = spawn;
+  }
+  
   goTo(newPosition) {
     this.lastMoveAt = this.game.time.now;
 

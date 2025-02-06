@@ -71,12 +71,49 @@ class Game {
   }
 
   getAndRemoveSpawn() {
-    let index = Math.floor(Math.random() * this.playerSpawns.length);
-    let spawnOnGrid = this.playerSpawns[index];
-    this.playerSpawns.splice(index, 1);
-
-    let spawn = { x: spawnOnGrid.col * TILE_SIZE, y: spawnOnGrid.row * TILE_SIZE };
+    if (this.playerSpawns.length === 0) {
+      // Regenerate spawn points if we've run out
+      this.playerSpawns = [];
+      for (let row = 0; row < this.shadow_map.length; row++) {
+        for (let col = 0; col < this.shadow_map[row].length; col++) {
+          if (this.shadow_map[row][col] === EMPTY_CELL) {
+            // Check if this cell is safe (not near walls)
+            if (this.isSafeSpawn(row, col)) {
+              this.playerSpawns.push({ col: col, row: row });
+            }
+          }
+        }
+      }
+    }
+  
+    const index = Math.floor(Math.random() * this.playerSpawns.length);
+    const spawnOnGrid = this.playerSpawns[index];
+    const spawn = { 
+      x: spawnOnGrid.col * TILE_SIZE + TILE_SIZE/2, 
+      y: spawnOnGrid.row * TILE_SIZE + TILE_SIZE/2 
+    };
+    
     return [spawn, spawnOnGrid];
+  }
+
+  isSafeSpawn(row, col) {
+    // Check surrounding cells for safety
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        const checkRow = row + i;
+        const checkCol = col + j;
+        
+        if (checkRow < 0 || checkRow >= this.shadow_map.length ||
+            checkCol < 0 || checkCol >= this.shadow_map[0].length) {
+          return false;
+        }
+        
+        if (this.shadow_map[checkRow][checkCol] !== EMPTY_CELL) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   createMapData() {
@@ -109,8 +146,8 @@ class Game {
     return mapMatrix;
   }
 
-  addBomb({ col, row, power }) {
-    let bomb = new Bomb({ game: this, col: col, row: row, power: power });
+  addBomb({ col, row, power, ownerId }) {
+    let bomb = new Bomb({ game: this, col: col, row: row, power: power, ownerId: ownerId });
     if ( this.bombs.get(bomb.id) ) {
       return false
     }

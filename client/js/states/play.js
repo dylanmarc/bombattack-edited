@@ -1,5 +1,5 @@
 import { findFrom, findAndDestroyFrom } from '../utils/utils';
-import { TILESET, LAYER } from '../utils/constants';
+import { TILESET, LAYER, TILE_SIZE } from '../utils/constants';
 
 import Player from '../entities/player';
 import EnemyPlayer from '../entities/enemy_player';
@@ -69,12 +69,64 @@ class Play extends Phaser.State {
 
   setEventHandlers() {
     clientSocket.on('move player', this.onMovePlayer.bind(this));
-    clientSocket.on('player win', this.onPlayerWin.bind(this));
+    // clientSocket.on('player win', this.onPlayerWin.bind(this));
     clientSocket.on('show bomb', this.onShowBomb.bind(this));
     clientSocket.on('detonate bomb', this.onDetonateBomb.bind(this));
     clientSocket.on('spoil was picked', this.onSpoilWasPicked.bind(this));
     clientSocket.on('show bones', this.onShowBones.bind(this));
     clientSocket.on('player disconnect', this.onPlayerDisconnect.bind(this));
+    clientSocket.on('player died', this.onPlayerDied.bind(this));
+    clientSocket.on('player respawned', this.onPlayerRespawned.bind(this));
+
+    clientSocket.on('update score', ({ player_id, score }) => {
+      const player = player_id === this.player.id ? this.player : findFrom(player_id, this.enemies);
+      if (player) {
+        player.updateScoreDisplay(score);
+      }
+    });
+    
+    clientSocket.on('player win', ({ winner, skin }) => {
+      //add text to say that player has won
+      this.game.add.text(400, 300, `${winner} has won!`, {
+        font: "32px Arial",
+        fill: "#fff",
+        stroke: "#000",
+        strokeThickness: 3
+      });
+
+      //wait 3 seconds before going to win state
+      this.game.time.events.add(4000, () => {
+      this.state.start('Win', true, false, skin);
+      });
+    });
+  }
+
+  onPlayerDied({ player_id }) {
+    const player = player_id === this.player.id ? this.player : findFrom(player_id, this.enemies);
+  
+    if (player) {
+      player.becomesDead(); // This should handle the visual "death" (e.g., hide the player)
+  
+      // Show bones at death location
+      const col = Math.floor(player.x / TILE_SIZE);
+      const row = Math.floor(player.y / TILE_SIZE);
+      this.bones.add(new Bone(this.game, col, row));
+    }
+  }
+
+  onPlayerRespawned({ player_id, spawn }) {
+    const player = player_id === this.player.id ? this.player : findFrom(player_id, this.enemies);
+    
+    if (player) {
+      player.reset(spawn.x, spawn.y);
+      player.revive();
+      player.currentPosition = spawn;
+      
+      if (player_id === this.player.id) {
+        player.info.deadText.visible = false;
+        player.body.enable = true;
+      }
+    }
   }
 
   onPlayerVsSpoil(player, spoil) {
@@ -84,7 +136,7 @@ class Play extends Phaser.State {
 
   onPlayerVsBlast(player, blast) {
     if (player.alive) {
-      clientSocket.emit('player died', { col: player.currentCol(), row: player.currentRow() });
+      clientSocket.emit('player died', { player_id: player.id, col: player.currentCol(), row: player.currentRow(), killer_id: blast.bomber_id});
       player.becomesDead()
     }
   }
@@ -108,13 +160,13 @@ class Play extends Phaser.State {
     this.bombs.add(new Bomb(this.game, bomb_id, col, row));
   }
 
-  onDetonateBomb({ bomb_id, blastedCells }) {
+  onDetonateBomb({ bomb_id, bomber_id, blastedCells }) {
     // Remove Bomb:
     findAndDestroyFrom(bomb_id, this.bombs)
 
     // Render Blast:
     for (let cell of blastedCells) {
-      this.blasts.add(new FireBlast(this.game, cell));
+      this.blasts.add(new FireBlast(this.game, cell, bomber_id));
     };
 
     // Destroy Tiles:
@@ -131,7 +183,6 @@ class Play extends Phaser.State {
 
       this.spoils.add(new Spoil(this.game, cell.spoil));
     };
-    
   }
 
   onSpoilWasPicked({ player_id, spoil_id, spoil_type }){
@@ -145,7 +196,7 @@ class Play extends Phaser.State {
   onShowBones({ player_id, col, row }) {
     this.bones.add(new Bone(this.game, col, row));
 
-    findAndDestroyFrom(player_id, this.enemies)
+    // findAndDestroyFrom(player_id, this.enemies)
   }
 
   onPlayerWin(winner_skin) {
