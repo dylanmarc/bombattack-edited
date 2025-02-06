@@ -19,7 +19,7 @@ const SKINS = [
   'Biarid', 'Solia', 'Kedan', 'Nigob', 'Baradir', 'Raviel', 'Valpo'
 ]
 
-const KILLS_TO_WIN = 1;
+const KILLS_TO_WIN = 5;
 
 module.exports = {
   TILE_SIZE,
